@@ -23,7 +23,7 @@ class Settings(BaseSettings):
         "http://localhost:5000",
         "*"
     ]
-    SECRET_KEY: str = secrets.token_urlsafe(32)
+    SECRET_KEY: str = "e13803a67359c67e64acfe5c943bc0d41edde0f8e5f4f6fb2839f3fe8460ab27"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 120
 
 
@@ -43,7 +43,21 @@ test_settings = TestConfig()
 
 
 # {
-#   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbG9uc29kQGV4YW1wbGUuY29tIiwiZXhwIjoxNzI1NzY3NDUzfQ.yQ6ED9BCmeunvNuV3_A4yzcazcKlH2GR_EcsTVp8Wmg",
+#   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huZEBleGFtcGxlLmNvbSIsImV4cCI6MTcyNTgzMjgxMn0.FO3O3MtSGb5x2Dj6e2gwlCESB7jSvgRHNJej9FUJ71g",
+#   "token_type": "Bearer",
+#   "user": {
+#     "name": "John Doe",
+#     "email": "johnd@example.com",
+#     "date_of_birth": "1990-01-01",
+#     "is_active": true,
+#     "is_admin": false,
+#     "personalID": "123456789",
+#     "id": "54ef0eb1-52be-46ef-ba8c-58c50286c6ed"
+#   }
+# }
+#admin
+# {
+#   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbG9uc29kQGV4YW1wbGUuY29tIiwiZXhwIjoxNzI1ODM2MzE3fQ.HVaNMW_2oOE37Aky_SKfoTU8MN9WsxTr8UOQLGjqArA",
 #   "token_type": "Bearer",
 #   "user": {
 #     "name": "Alonso Doe",
