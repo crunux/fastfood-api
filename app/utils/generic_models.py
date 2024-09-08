@@ -21,12 +21,17 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     email: str | None = None
 
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str
     user: UserInDB
-    
+
+
 class OAuth2CustomPasswordRequestForm(BaseModel):
     email: str = Form()
     password: str
-    
+
+
+class Msg(BaseModel):
+    msg: str
