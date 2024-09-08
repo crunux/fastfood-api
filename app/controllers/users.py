@@ -1,18 +1,15 @@
 from datetime import timedelta
-from typing import Annotated
 import uuid
-from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
-from fastapi import status, Depends, HTTPException
-from app.database import get_session
-from app.auth import create_token, get_current_active_user, get_current_active_admin
+from fastapi import status, HTTPException
+from app.auth import create_token
 from app.utils.security import hash_password, verify_password
 from app.utils.generic_models import TokenResponse, OAuth2CustomPasswordRequestForm
-from app.models.users import User, UserCreate, UserUpdate, UserInDB, LoginUser
+from app.models.users import User, UserCreate, UserUpdate, UserInDB
 from app.config import settings
 
 
-def create(user: UserCreate, userAccess: Annotated[UserInDB, Depends(get_current_active_admin)], db: Session = Depends(get_session)) -> UserInDB:
+def create(user: UserCreate, userAccess: User, db: Session) -> UserInDB:
     # return user
     hashed_password = hash_password(user.password)
     extra_data = {"password_hash": hashed_password}
@@ -25,9 +22,9 @@ def create(user: UserCreate, userAccess: Annotated[UserInDB, Depends(get_current
     return db_user
 
 
-def login(login_user: Annotated[OAuth2CustomPasswordRequestForm, Depends(LoginUser)], db: Session = Depends(get_session)) -> TokenResponse:
+def login(login_user: OAuth2CustomPasswordRequestForm, db: Session) -> TokenResponse:
     user = get_user_by_email(login_user.email, db)
-    print(user)
+    print(user, "Login")
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Incorrect email or password")
@@ -41,20 +38,21 @@ def login(login_user: Annotated[OAuth2CustomPasswordRequestForm, Depends(LoginUs
     return {"access_token": access_token, "token_type": "Bearer", "user": user}
 
 
-def get_users(userAccess: Annotated[UserInDB, Depends(get_current_active_admin)], db: Session = Depends(get_session)) -> list[UserInDB]:
-    users = db.exec(select(User)).all()
+def get_users(userAccess: User, db: Session) -> list[UserInDB]:
+    statement = select(User).order_by(User.id)
+    users = db.exec(statement).all()
     return users
 
 
-def get_user_by_id(id: uuid.UUID, db: Session = Depends(get_session)) -> UserInDB:
+def get_user_by_id(id: uuid.UUID, userAccess: User, db: Session) -> UserInDB:
     user = db.get(User, id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"User not found with id: {id}")
+                            detail=f"User not found")
     return user
 
 
-def get_user_by_email(email: str, db: Session = Depends(get_session)) -> UserInDB:
+def get_user_by_email(email: str, db: Session) -> UserInDB:
     user = db.exec(select(User).where(User.email == email)).first()
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -62,20 +60,20 @@ def get_user_by_email(email: str, db: Session = Depends(get_session)) -> UserInD
     return user
 
 
-def update(id: uuid.UUID, user: UserUpdate, db: Session = Depends(get_session)) -> UserInDB:
+def update(id: uuid.UUID, user: UserUpdate, userAccess: User, db: Session) -> UserInDB:
     db_user = db.get(User, id)
     if not db_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"User not found with id: {id}")
+                            detail=f"User not found")
 
     user_data = user.model_dump(exclude_unset=True)
     extra_data = {}
 
     if "password" in user_data:
         hashed_password = hash_password(user_data["password"])
-        extra_data["hashed_password"] = hashed_password
+        extra_data["password_hash"] = hashed_password
 
-    user_data.sqlmodel_update(db_user, extra_data)
+    db_user.sqlmodel_update(user_data, extra_data)
 
     db.add(db_user)
     db.commit()
@@ -83,7 +81,7 @@ def update(id: uuid.UUID, user: UserUpdate, db: Session = Depends(get_session)) 
     return db_user
 
 
-def delete(id: uuid.UUID, db: Session = Depends(get_session)) -> dict:
+def delete(id: uuid.UUID, userAccess: User, db: Session) -> dict:
     db_user = db.get(User, id)
     if not db_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
