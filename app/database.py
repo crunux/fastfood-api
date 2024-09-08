@@ -2,7 +2,15 @@ from sqlmodel import Session, SQLModel, create_engine
 
 from app.config import settings
 
-engine = create_engine(settings.DATABASE_URL, echo=True)
+args = {
+    "keepalives": 1,
+    "keepalives_idle": 30,
+    "keepalives_interval": 10,
+    "keepalives_count": 5,
+}
+
+engine = create_engine(settings.DATABASE_URL,
+                       pool_pre_ping=True, connect_args=args)
 
 
 def init_db():
