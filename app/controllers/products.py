@@ -6,7 +6,10 @@ from app.database import get_session
 
 
 def create_product(product: ProductCreate, db: Session = Depends(get_session)) -> ProductInDB:
-    product = Product.model_validate(product)
+    extra_data = {
+        "tax": round(product.price * 0.18, 2)
+    }
+    product = Product.model_validate(product, update=extra_data)
     db.add(product)
     db.commit()
     db.refresh(product)
@@ -20,42 +23,35 @@ def get_products(db: Session = Depends(get_session)) -> list[ProductInDB]:
 
 
 def get_product_by_id(id: uuid.UUID, db: Session = Depends(get_session)) -> ProductInDB:
-    statement = select(Product).where(Product.id == id)
-    product = db.exec(statement).first()
+    product = db.get(Product, id)
+    print(product)
     if not product:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"Product not found with id: {id}")
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Product not found")
     return product
 
 
 def update_product(id: uuid.UUID, product: ProductUpdate, db: Session = Depends(get_session)) -> ProductInDB:
-
-    productUpdate = db.get(Product, id)
-
-    if not productUpdate:
+    db_product = db.get(Product, id)
+    if not db_product:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"Product not found with id: {id}")
-
+            status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
     productData = product.model_dump(exclude_unset=True)
-
-    for key, value in productData.items():
-        setattr(productUpdate, key, value)
-
-    # statement = text(
-    #     "UPDATE products SET name = :name, description = :description, price = :price WHERE id = :id")
-    # db.exec(statement, {"id": id, **product.dict()})
-
-    db.add(product)
+    extra_data = {}
+    if "price" in productData:
+        extra_data["tax"] = round(productData["price"] * 0.18, 2)
+    db_product.sqlmodel_update(productData, update=extra_data)
+    db.add(db_product)
     db.commit()
-    db.refresh(product)
-    return get_product_by_id(id, db)
+    db.refresh(db_product)
+    return db_product
 
 
 def delete_product(id: uuid.UUID, db: Session = Depends(get_session)) -> dict:
     product = db.get(Product, id)
     if not product:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"Product not found with id: {id}")
+            status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
 
     db.delete(product)
     db.commit()

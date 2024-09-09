@@ -6,10 +6,10 @@ import uuid
 
 class ProductBase(SQLModel):
     name: str
-    description: str | None = ""
+    description: str = ""
     price: float
-    tax: float
-    active: bool | None = True
+    tax: float = 0.0
+    active: bool = True
 
     class Config:
         json_schema_extra = {
@@ -35,6 +35,8 @@ class Product(ProductBase, table=True):
 
 class ProductCreate(ProductBase):
     category_id: uuid.UUID | None = None
+    tax: float | None = None,
+    active: bool | None = None
     pass
 
 
@@ -50,4 +52,4 @@ class ProductUpdate(ProductBase):
 class ProductInDB(ProductBase):
     id: uuid.UUID
     category_id: uuid.UUID
-    category: Category | None = None
+    category: Category | None = {}

@@ -1,9 +1,12 @@
+from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 from sqlmodel import Session
 import uuid
+from app.auth import get_current_active_admin, get_current_active_user
 from app.database import get_session
-from app.models.products import ProductCreate, ProductInDB
+from app.models.products import ProductCreate, ProductInDB, ProductUpdate
 from app.controllers import create_product, get_products, get_product_by_id, update_product, delete_product
+from app.models.users import User
 
 
 router = APIRouter(tags=["Products"], responses={
@@ -11,27 +14,25 @@ router = APIRouter(tags=["Products"], responses={
 
 
 @router.post("", response_model=ProductInDB)
-async def create_a_product(newProduct: ProductCreate, db: Session = Depends(get_session)) -> ProductInDB:
+async def create_a_product(newProduct: ProductCreate, userAccess: Annotated[User, Depends(get_current_active_admin)], db: Session = Depends(get_session)) -> ProductInDB:
     return create_product(newProduct, db)
 
 
 @router.get("", response_model=list[ProductInDB])
-async def read_products(db: Session = Depends(get_session)) -> list[ProductInDB]:
+async def read_products(userAccess: Annotated[User, Depends(get_current_active_user)], db: Session = Depends(get_session)) -> list[ProductInDB]:
     return get_products(db)
 
 
 @router.get("/{product_id}", response_model=ProductInDB)
-async def read_a_product(product_id: uuid.UUID, db: Session = Depends(get_session)) -> ProductInDB:
-    # next((x for x in products_list if x["id"] == product_id), None)
-    # next(filter(lambda x: x["id"] == product_id, products_list), None)
+async def read_a_product(product_id: uuid.UUID, userAccess: Annotated[User, Depends(get_current_active_user)], db: Session = Depends(get_session)) -> ProductInDB:
     return get_product_by_id(product_id, db)
 
 
 @router.put("/{product_id}", response_model=ProductInDB)
-async def update_a_product(product_id: uuid.UUID, product: ProductCreate, db: Session = Depends(get_session)) -> ProductInDB:
+async def update_a_product(product_id: uuid.UUID, product: ProductUpdate, userAccess: Annotated[User, Depends(get_current_active_admin)], db: Session = Depends(get_session)) -> ProductInDB:
     return update_product(product_id, product, db)
 
 
 @router.delete("/{product_id}", response_model=dict)
-async def delete_a_product(product_id: uuid.UUID, db: Session = Depends(get_session)) -> dict:
+async def delete_a_product(product_id: uuid.UUID, userAccess: Annotated[User, Depends(get_current_active_admin)], db: Session = Depends(get_session)) -> dict:
     return delete_product(product_id, db)
