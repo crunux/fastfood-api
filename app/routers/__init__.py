@@ -11,6 +11,6 @@ api.include_router(products.router, prefix="/products",
 api.include_router(users.router, prefix="/users",
                    tags=["Users"])
 api.include_router(login.router, prefix="/login",
-                   tags=["Users"])
+                   tags=["Login"])
 api.include_router(categories.router, prefix="/categories",
                    tags=["Categories"])
