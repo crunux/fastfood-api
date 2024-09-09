@@ -65,15 +65,13 @@ def update(id: uuid.UUID, user: UserUpdate, userAccess: User, db: Session) -> Us
     if not db_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"User not found")
-
     user_data = user.model_dump(exclude_unset=True)
     extra_data = {}
-
     if "password" in user_data:
         hashed_password = hash_password(user_data["password"])
         extra_data["password_hash"] = hashed_password
 
-    db_user.sqlmodel_update(user_data, extra_data)
+    db_user.sqlmodel_update(user_data, update=extra_data)
 
     db.add(db_user)
     db.commit()
