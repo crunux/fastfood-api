@@ -7,37 +7,27 @@ from app.controllers.products import get_product_by_id
 from app.models.orders import Order, OrderCreate, OrderInDB
 
 
-def create_order(order: OrderCreate, userAccess: UserInDB, db: Session) -> OrderInDB:
-    detailsData = order.details_orders
-    order.details_orders.delete()
+def add_details_order(details_order: DetailsOrderCreate, db: Session) -> dict[str, int | float | str]:
     total_amount = 0
     total_tax = 0
-    print("step 1", total_amount, total_tax)  # debug
-    extra_data = {
-        "user_id": userAccess.id,
-        "total_amount": total_amount,
-        "total_tax": total_tax,
-        "order_date": datetime.now(),
-    }
-    order = Order.model_validate(order, update=extra_data)
-    db.add(order)
-    db.commit()
-    for detail in detailsData:
+    for detail in details_order:
         product = get_product_by_id(detail.product_id, db)
         total_amount += detail.quantity * product.price
         total_tax += detail.quantity * product.tax
-        print("step 2", total_amount, total_tax)  # debug
-        detailData = {"order_id": order.id,
-                      "product_id": detail.product_id,
-                      "quantity": detail.quantity
-                      }
-        db.add(DetailsOrder.model_validate(detailData))
-        db.commit()
     total_amount += total_tax
-    print("step 3", total_amount, total_tax)  # debug
-    ordenData = order.model_dump(exclude_unset=True)
-    order.sqlmodel_update(
-        ordenData, update={"total_amount": total_amount, "total_tax": total_tax})
+    return {"total_amount": total_amount, "total_tax": total_tax}
+
+
+def create_order(order: OrderCreate, userAccess: UserInDB, db: Session) -> OrderInDB:
+    detailsData = add_details_order(order.details_orders, db)
+    print("step 1", detailsData)  # debug
+    extra_data = {
+        "user_id": userAccess.id,
+        "total_amount": detailsData["total_amount"],
+        "total_tax": detailsData["total_tax"],
+        "order_date": datetime.now(),
+    }
+    order = Order.model_validate(order, update=extra_data)
     db.add(order)
     db.commit()
     db.refresh(order)
