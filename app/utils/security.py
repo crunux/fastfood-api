@@ -1,4 +1,7 @@
 from passlib.context import CryptContext
+import logging
+
+logging.getLogger("passlib").setLevel(logging.ERROR)
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
