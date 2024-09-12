@@ -2,10 +2,10 @@ from sqlmodel import Session, select
 from fastapi import status, Depends, HTTPException
 import uuid
 from app.models.products import Product, ProductCreate, ProductUpdate, ProductInDB
-from app.database import get_session
+from app.models.users import UserInDB
 
 
-def create_product(product: ProductCreate, db: Session = Depends(get_session)) -> ProductInDB:
+def create_product(product: ProductCreate, db: Session) -> ProductInDB:
     extra_data = {
         "tax": round(product.price * 0.18, 2)
     }
@@ -16,22 +16,20 @@ def create_product(product: ProductCreate, db: Session = Depends(get_session)) -
     return product
 
 
-def get_products(db: Session = Depends(get_session)) -> list[ProductInDB]:
-    statement = select(Product).order_by(Product.id)
-    products = db.exec(statement).all()
+def get_products(acessUser: UserInDB, db: Session) -> list[ProductInDB]:
+    products = db.exec(select(Product)).all()
     return products
 
 
-def get_product_by_id(id: uuid.UUID, db: Session = Depends(get_session)) -> ProductInDB:
+def get_product_by_id(id: uuid.UUID, db: Session) -> ProductInDB:
     product = db.get(Product, id)
-    print(product)
     if not product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"Product not found")
     return product
 
 
-def update_product(id: uuid.UUID, product: ProductUpdate, db: Session = Depends(get_session)) -> ProductInDB:
+def update_product(id: uuid.UUID, product: ProductUpdate, db: Session) -> ProductInDB:
     db_product = db.get(Product, id)
     if not db_product:
         raise HTTPException(
@@ -47,7 +45,7 @@ def update_product(id: uuid.UUID, product: ProductUpdate, db: Session = Depends(
     return db_product
 
 
-def delete_product(id: uuid.UUID, db: Session = Depends(get_session)) -> dict:
+def delete_product(id: uuid.UUID, db: Session) -> dict:
     product = db.get(Product, id)
     if not product:
         raise HTTPException(
