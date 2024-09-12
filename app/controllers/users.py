@@ -24,7 +24,6 @@ def create(user: UserCreate, userAccess: User, db: Session) -> UserInDB:
 
 def login(login_user: OAuth2CustomPasswordRequestForm, db: Session) -> TokenResponse:
     user = get_user_by_email(login_user.email, db)
-    print(user, "Login")
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Incorrect email or password")
@@ -38,13 +37,13 @@ def login(login_user: OAuth2CustomPasswordRequestForm, db: Session) -> TokenResp
     return {"access_token": access_token, "token_type": "Bearer", "user": user}
 
 
-def get_users(userAccess: User, db: Session) -> list[UserInDB]:
+def get_users(userAccess: UserInDB, db: Session) -> list[UserInDB]:
     statement = select(User).order_by(User.id)
     users = db.exec(statement).all()
     return users
 
 
-def get_user_by_id(id: uuid.UUID, userAccess: User, db: Session) -> UserInDB:
+def get_user_by_id(id: uuid.UUID, userAccess: UserInDB, db: Session) -> UserInDB:
     user = db.get(User, id)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -60,7 +59,7 @@ def get_user_by_email(email: str, db: Session) -> UserInDB:
     return user
 
 
-def update(id: uuid.UUID, user: UserUpdate, userAccess: User, db: Session) -> UserInDB:
+def update(id: uuid.UUID, user: UserUpdate, userAccess: UserInDB, db: Session) -> UserInDB:
     db_user = db.get(User, id)
     if not db_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -79,7 +78,7 @@ def update(id: uuid.UUID, user: UserUpdate, userAccess: User, db: Session) -> Us
     return db_user
 
 
-def delete(id: uuid.UUID, userAccess: User, db: Session) -> dict:
+def delete(id: uuid.UUID, userAccess: UserInDB, db: Session) -> dict:
     db_user = db.get(User, id)
     if not db_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,

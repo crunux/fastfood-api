@@ -1,11 +1,11 @@
 from sqlmodel import SQLModel, Field, Relationship
-from app.utils.generic_models import ProductCategory
 import uuid
+from app.utils.generic_models import ProductCategory
 
 
 class CategoryBase(SQLModel):
     name: str
-    description: str | None = ""
+    description: str = ""
 
     class Config:
         json_schema_extra = {
@@ -24,8 +24,7 @@ class CategoryBase(SQLModel):
 
 class Category(CategoryBase, table=True):
     id: uuid.UUID | None = Field(default_factory=uuid.uuid4, primary_key=True)
-    products: list["Product"] = Relationship(
-        back_populates="category", link_model=ProductCategory)
+    products: list['Product'] = Relationship(back_populates="category")
 
 
 class CategoryCreate(CategoryBase):
@@ -35,8 +34,7 @@ class CategoryCreate(CategoryBase):
 class CategoryInDB(CategoryBase):
     id: uuid.UUID
     name: str
-    description: str | None = None
-    products: list | None = None
+    description: str = ""
 
 
 class CategoryUpdate(CategoryBase):
