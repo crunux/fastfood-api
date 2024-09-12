@@ -8,9 +8,12 @@ from sqlmodel import SQLModel  # New import
 
 from alembic import context
 
-from app.models.categories import Category  # New import
-from app.models.products import Product  # New import
-from app.models.users import User  # New import
+from app.models.users import User
+from app.models.products import Product
+from app.models.categories import Category
+from app.models.orders import Order
+from app.models.details_orders import DetailsOrder
+  # New import
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
