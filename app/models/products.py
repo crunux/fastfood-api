@@ -1,7 +1,6 @@
 from decimal import Decimal
 from sqlmodel import SQLModel, Field, Relationship
 from app.models.categories import Category
-from app.utils.generic_models import ProductCategory
 
 import uuid
 

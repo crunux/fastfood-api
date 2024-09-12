@@ -1,6 +1,5 @@
 from sqlmodel import SQLModel, Field, Relationship
 import uuid
-from app.utils.generic_models import ProductCategory
 
 
 class CategoryBase(SQLModel):
