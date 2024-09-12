@@ -1,14 +1,16 @@
+from decimal import Decimal
 from sqlmodel import SQLModel, Field, Relationship
 from app.models.categories import Category
 from app.utils.generic_models import ProductCategory
+
 import uuid
 
 
 class ProductBase(SQLModel):
     name: str
     description: str = ""
-    price: float
-    tax: float = 0.0
+    price: Decimal
+    tax: Decimal = 0.0
     active: bool = True
 
     class Config:
@@ -27,29 +29,28 @@ class ProductBase(SQLModel):
 
 class Product(ProductBase, table=True):
     id: uuid.UUID | None = Field(default_factory=uuid.uuid4, primary_key=True)
-    category_id: uuid.UUID | None = Field(
-        default_factory=uuid.uuid4, foreign_key="category.id")
-    category: Category = Relationship(
-        back_populates="products", link_model=ProductCategory)
+    category_id: uuid.UUID | None = Field(foreign_key="category.id")
+    category: Category = Relationship(back_populates="products")
+    details_orders: list['DetailsOrder'] = Relationship(
+        back_populates="product")
 
 
 class ProductCreate(ProductBase):
     category_id: uuid.UUID | None = None
-    tax: float | None = None,
+    tax: Decimal | None = None
     active: bool | None = None
-    pass
 
 
 class ProductUpdate(ProductBase):
     name: str | None = None
     description: str | None = None
-    price: float | None = None
-    tax: float | None = None
-    active: bool | None = None
+    price: Decimal | None = None
+    tax: Decimal | None = None
+    active: Decimal | None = None
     category_id: uuid.UUID | None = None
 
 
 class ProductInDB(ProductBase):
     id: uuid.UUID
     category_id: uuid.UUID
-    category: Category | None = {}
+    category: Category
