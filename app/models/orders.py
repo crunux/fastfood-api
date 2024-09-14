@@ -1,6 +1,7 @@
 from datetime import datetime
 from enum import Enum
-from app.models.details_orders import DetailsOrder, DetailsOrderCreate
+from pydantic import BaseModel
+from app.models.details_orders import DetailsOrder, DetailsOrderCreate, DetailsOrderInDB
 from sqlmodel import SQLModel, Field, Relationship
 from decimal import Decimal
 import uuid
@@ -59,13 +60,18 @@ class OrderUpdate(OrderBase):
     total_tax: Decimal | None = None
     user_id: uuid.UUID | None = None
     shipping_address: str | None = None
+    details_orders: list['DetailsOrder'] | None = None
 
 
-class OrderInDB(OrderBase):
+class OrderInDB(BaseModel):
     id: uuid.UUID
     total_amount: Decimal
     status: StatusType
     user_id: uuid.UUID
     order_date: datetime
     total_tax: Decimal
-    details_orders: list["DetailsOrder"]
+    details_orders: list["DetailsOrderInDB"]
+    
+    class Config:
+        from_attributes = True
+

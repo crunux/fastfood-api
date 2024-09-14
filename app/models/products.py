@@ -1,6 +1,7 @@
 from decimal import Decimal
+from pydantic import BaseModel
 from sqlmodel import SQLModel, Field, Relationship
-from app.models.categories import Category
+from app.models.categories import Category, CategoryInDB
 
 import uuid
 
@@ -49,7 +50,10 @@ class ProductUpdate(ProductBase):
     category_id: uuid.UUID | None = None
 
 
-class ProductInDB(ProductBase):
+class ProductInDB(BaseModel):
     id: uuid.UUID
     category_id: uuid.UUID
-    category: Category
+    category: CategoryInDB
+
+    class Config:
+        from_attributes = True

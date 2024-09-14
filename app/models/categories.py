@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from sqlmodel import SQLModel, Field, Relationship
 import uuid
 
@@ -30,10 +31,13 @@ class CategoryCreate(CategoryBase):
     pass
 
 
-class CategoryInDB(CategoryBase):
+class CategoryInDB(BaseModel):
     id: uuid.UUID
     name: str
     description: str = ""
+
+    class Config:
+        from_attributes = True
 
 
 class CategoryUpdate(CategoryBase):

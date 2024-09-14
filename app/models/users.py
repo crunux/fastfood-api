@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Field
-from pydantic import EmailStr
+from pydantic import BaseModel, EmailStr
 import uuid
 
 
@@ -49,5 +49,13 @@ class UserUpdate(UserBase):
     personalId: str | None = None
 
 
-class UserInDB(UserBase):
+class UserInDB(BaseModel):
     id: uuid.UUID
+    name: str
+    date_of_birth: str
+    is_active: bool
+    is_admin: bool
+    personalID: str
+
+    class Config:
+        from_attributes = True

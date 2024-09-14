@@ -1,7 +1,8 @@
 
 import uuid
+from pydantic import BaseModel
 from sqlmodel import SQLModel, Field, Relationship
-from app.models.products import Product
+from app.models.products import Product, ProductInDB
 
 
 class DetailsOrderBase(SQLModel):
@@ -31,10 +32,12 @@ class DetailsOrderUpdate(DetailsOrderBase):
     quantity: int | None = None
 
 
-class DetailsOrderInDB(DetailsOrderBase):
+class DetailsOrderInDB(BaseModel):
     id: uuid.UUID
     product_id: uuid.UUID
     order_id: uuid.UUID
     quantity: int
-    product: Product
-    order: "Order"
+    product: ProductInDB
+
+    class Config:
+        from_attributes = True
