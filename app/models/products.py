@@ -52,6 +52,10 @@ class ProductUpdate(ProductBase):
 
 class ProductInDB(BaseModel):
     id: uuid.UUID
+    name: str
+    description: str
+    price: Decimal
+    tax: Decimal
     category_id: uuid.UUID
     category: CategoryInDB
 
