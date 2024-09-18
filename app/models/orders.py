@@ -30,7 +30,7 @@ class DetailsProduct(SQLModel):
 
 class OrderBase(SQLModel):
     name: str = ""
-    cel: str = ""
+    movil: str = ""
     total_amount: Decimal = 0.0
     status: StatusType = Field(default=StatusType.ordered, index=False,
                                nullable=False)
@@ -46,10 +46,10 @@ class OrderBase(SQLModel):
 class Order(OrderBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str = Field(default="", index=False, nullable=False)
-    cel: str = Field(default="", index=False, nullable=False)
+    movil: str = Field(default="", index=False, nullable=False)
     user_id: uuid.UUID = Field(foreign_key="user.id")
     details_orders: list['DetailsOrder'] = Relationship(
-        back_populates="order")
+        back_populates="order", cascade_delete=True)
 
 
 class OrderCreate(OrderBase):
@@ -70,8 +70,8 @@ class OrderUpdate(OrderBase):
 
 class OrderInDB(BaseModel):
     id: uuid.UUID
-    name: str
-    cel: str
+    name: str | None = None
+    movil: str | None = None
     total_amount: Decimal
     status: StatusType
     user_id: uuid.UUID

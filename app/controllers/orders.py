@@ -22,7 +22,6 @@ def add_details_order(details_order: DetailsOrderCreate, db: Session) -> dict[st
 
 def create_order(order: OrderCreate, userAccess: UserInDB, db: Session) -> OrderInDB:
     detailsData = add_details_order(order.details_orders, db)
-    print("step 1", detailsData)  # debug
     extra_data = {
         "user_id": userAccess.id,
         "total_amount": detailsData["total_amount"],
