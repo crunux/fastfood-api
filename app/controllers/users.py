@@ -12,7 +12,7 @@ from app.config import settings
 def create(user: UserCreate, userAccess: User, db: Session) -> UserInDB:
     user_found = db.exec(select(User).where(User.email == user.email)).first()
     if user_found:
-        raise HTTPException(status_code=status.HTTP_302_FOUND,
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"User with email {user.email} already exists")
     hashed_password = hash_password(user.password)
     extra_data = {"password_hash": hashed_password}

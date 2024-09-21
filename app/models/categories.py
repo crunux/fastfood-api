@@ -31,6 +31,10 @@ class CategoryCreate(CategoryBase):
     pass
 
 
+class CategoryUpdate(CategoryBase):
+    name: str | None = None
+    description: str | None = None
+
 class CategoryInDB(BaseModel):
     id: uuid.UUID
     name: str
@@ -38,8 +42,3 @@ class CategoryInDB(BaseModel):
 
     class Config:
         from_attributes = True
-
-
-class CategoryUpdate(CategoryBase):
-    name: str | None = None
-    description: str | None = None

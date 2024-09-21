@@ -18,6 +18,9 @@ def create_product(product: ProductCreate, db: Session) -> ProductInDB:
 
 def get_products(acessUser: UserInDB, db: Session) -> list[ProductInDB]:
     products = db.exec(select(Product)).all()
+    if len(products)  == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Products not found")
     return products
 
 

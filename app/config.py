@@ -11,16 +11,19 @@ class Settings(BaseSettings):
     ENV: Literal["development", "production"] = "development"
     VERSION: str = "0.1"
     SECRET_KEY: str = secrets.token_urlsafe(32)
-    DATABASE_URL: str = "postgresql://store_owner:guw1xtJ7hIeo@ep-lingering-tooth-a5zaa2z5.us-east-2.aws.neon.tech/store"
+    DATABASE_URL: str = "postgresql://root:Cross19950502@127.0.0.1:5432/fastfood"
+    # DATABASE_URL: str = "postgresql://store_owner:guw1xtJ7hIeo@ep-lingering-tooth-a5zaa2z5.us-east-2.aws.neon.tech/store"
     # DATABASE_URL: str = "postgresql://store_owner:guw1xtJ7hIeo@ep-lingering-tooth-a5zaa2z5.us-east-2.aws.neon.tech/store?sslmode=require"
     API_V1_STR: str = "/api/v1"
     API_USERNAME: str = "admin"
     API_PASSWORD: str = "admin"
+    API_EMAIL: str = "joancruz0502@hotmail.com"
     ORIGINS: list[str] = [
         "http://localhost",
         "http://localhost:8080",
         "http://localhost:3000",
         "http://localhost:5000",
+        "http://localhost:8100",
         "*"
     ]
     SECRET_KEY: str = "e13803a67359c67e64acfe5c943bc0d41edde0f8e5f4f6fb2839f3fe8460ab27"

@@ -5,6 +5,7 @@ from app.config import Settings, settings
 from app.database import init_db
 from app.routers import api
 from app.utils.logger import logger_setup
+from app.utils.seed import create_admin
 
 logger = logger_setup(__name__)
 
@@ -12,6 +13,7 @@ logger = logger_setup(__name__)
 @asynccontextmanager
 async def life_span(app: FastAPI):
     app.state.async_session = init_db()
+    create_admin()
     logger.info("startup: triggered")
 
     yield
