@@ -30,5 +30,5 @@ def create_admin():
             logger.info("Password: %s", init_user.password)
         except Exception as e:
             logger.error("Error creating admin: %s", e)
-            logger.error("Admin already exists")
+            logger.debug("Admin already exists")
             return
