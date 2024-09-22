@@ -8,7 +8,7 @@ import uuid
 
 from app.models.users import User
 
-router = APIRouter(tags=["Categories"], responses={
+router = APIRouter(responses={
                    404: {"description": "Not found"}})
 
 

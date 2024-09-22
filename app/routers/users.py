@@ -7,7 +7,7 @@ from app.controllers.users import create, get_users, get_user_by_id, update, del
 from app.database import get_session
 from app.models.users import User, UserInDB, UserCreate, UserUpdate
 
-router = APIRouter(tags=["Users"], responses={
+router = APIRouter(responses={
                    404: {"description": "Not found"}})
 
 

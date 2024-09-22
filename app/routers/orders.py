@@ -8,7 +8,7 @@ from app.database import get_session
 from app.models.orders import OrderCreate, OrderInDB, OrderUpdate
 from app.models.users import UserInDB
 
-router = APIRouter(tags=["Orders"], responses={
+router = APIRouter( responses={
                    404: {"description": "Not found"}})
 
 

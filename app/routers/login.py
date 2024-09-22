@@ -10,7 +10,7 @@ from app.models.users import UserInDB, LoginUser
 from app.utils.generic_models import Msg, OAuth2CustomPasswordRequestForm, TokenResponse
 from app.auth import create_token, get_current_user
 
-router = APIRouter(tags=["Login"], responses={
+router = APIRouter(responses={
                    404: {"description": "Not found"}})
 
 
