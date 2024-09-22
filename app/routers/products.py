@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, UploadFile
 from sqlmodel import Session
 import uuid
 from app.auth import get_current_active_admin, get_current_active_user
@@ -14,8 +14,8 @@ router = APIRouter(tags=["Products"], responses={
 
 
 @router.post("", response_model=ProductInDB)
-async def create_a_product(newProduct: ProductCreate, userAccess: Annotated[UserInDB, Depends(get_current_active_admin)], db: Session = Depends(get_session)) -> ProductInDB:
-    return create_product(newProduct, db)
+async def create_a_product(newProduct: ProductCreate, userAccess: Annotated[UserInDB,  Depends(get_current_active_admin)], file: UploadFile  ,db: Session = Depends(get_session)) -> ProductInDB:
+    return await create_product(newProduct, file, db)
 
 
 @router.get("", response_model=list[ProductInDB])

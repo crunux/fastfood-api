@@ -1,18 +1,53 @@
-from sqlmodel import Session, select
-from fastapi import status, Depends, HTTPException
+import os
 import uuid
+from app.config import settings
+from sqlmodel import Session, select
+from fastapi import UploadFile, status, HTTPException
 from app.models.products import Product, ProductCreate, ProductUpdate, ProductInDB
 from app.models.users import UserInDB
 
+UPLOAD_DIR = "img/products/"
 
-def create_product(product: ProductCreate, db: Session) -> ProductInDB:
-    extra_data = {
-        "tax": round(product.price * 0.18, 2)
-    }
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+
+
+async def create_product(product: ProductCreate, file: UploadFile, db: Session) -> ProductInDB:
+    
+    if file:
+        if file.content_type not in ["image/jpeg", "image/png"]:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Only images allowed ''jpeg' or 'png'")
+    
+        file_name = f'{uuid.uuid4().hex}{os.path.splitext(file.filename)[1]}'
+        file_name_dir = os.path.join(UPLOAD_DIR, file_name)
+        
+        with open(file_name_dir, "wb") as buffer:
+            buffer.write(await file.read())
+        
+        extra_data = {
+            "tax": round(product.price * 0.18, 2),
+            "image": ("",file_name)[file] 
+        }
+    else: 
+        extra_data = {
+            "tax": round(product.price * 0.18, 2),
+            "image": ""
+        }
     product = Product.model_validate(product, update=extra_data)
     db.add(product)
     db.commit()
     db.refresh(product)
+    product = {
+      "id": product.id,
+        "name": product.name,
+        "description": product.description,
+        "price": product.price,
+        "tax": product.tax,
+        "active": product.active,
+        "image": (product.image, f"{settings.SERVER_HOST}/{UPLOAD_DIR}{product.image}")[product.image != ""]
+        
+    }
     return product
 
 

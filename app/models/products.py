@@ -12,6 +12,7 @@ class ProductBase(SQLModel):
     price: Decimal
     tax: Decimal = 0.0
     active: bool = True
+    image: str = ""
 
     class Config:
         json_schema_extra = {
@@ -33,6 +34,7 @@ class Product(ProductBase, table=True):
     category: Category = Relationship(back_populates="products")
     details_orders: list['DetailsOrder'] = Relationship(
         back_populates="product")
+    image: str = Field(default="")
 
 
 class ProductCreate(ProductBase):
@@ -48,6 +50,7 @@ class ProductUpdate(ProductBase):
     tax: Decimal | None = None
     active: Decimal | None = None
     category_id: uuid.UUID | None = None
+    image: str | None = None
 
 
 class ProductInDB(BaseModel):
@@ -56,6 +59,7 @@ class ProductInDB(BaseModel):
     description: str
     price: Decimal
     tax: Decimal
+    image: str
     category_id: uuid.UUID
     category: CategoryInDB
 
