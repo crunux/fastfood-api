@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     ]
     SECRET_KEY: str = "e13803a67359c67e64acfe5c943bc0d41edde0f8e5f4f6fb2839f3fe8460ab27"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 120
+    SERVER_HOST: str = "http://127.0.0.1:5000"
+    
 
 
 class Config:
