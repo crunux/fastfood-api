@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.config import Settings, settings
 from app.database import init_db
 from app.routers import api
@@ -32,6 +33,8 @@ def create_app(setting: Settings):
         description=setting.DESCRIPTION,
         lifespan=life_span,
     )
+    
+    app.mount("/img/product/", StaticFiles(directory="img/product"), name="product")
 
     app.add_middleware(
         CORSMiddleware,
