@@ -10,9 +10,8 @@ class Settings(BaseSettings):
     DESCRIPTION: str = "This is a store API"
     ENV: Literal["development", "production"] = "development"
     VERSION: str = "0.1"
-    SECRET_KEY: str = secrets.token_urlsafe(32)
     DATABASE_URL: str = "postgresql://root:Cross19950502@127.0.0.1:5432/fastfood"
-    # DATABASE_URL: str = "postgresql://store_owner:guw1xtJ7hIeo@ep-lingering-tooth-a5zaa2z5.us-east-2.aws.neon.tech/store"
+    #DATABASE_URL: str = "postgresql://store_owner:guw1xtJ7hIeo@ep-lingering-tooth-a5zaa2z5.us-east-2.aws.neon.tech/store"
     # DATABASE_URL: str = "postgresql://store_owner:guw1xtJ7hIeo@ep-lingering-tooth-a5zaa2z5.us-east-2.aws.neon.tech/store?sslmode=require"
     API_V1_STR: str = "/api/v1"
     API_USERNAME: str = "admin"
