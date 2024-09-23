@@ -13,19 +13,7 @@ class ProductBase(SQLModel):
     tax: Decimal = 0.0
     active: bool = True
     image: str = ""
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "id": "16fd2706-8baf-433b-82eb-8c7fada847da",
-                "name": "Hamburguer",
-                "description": "Hamburguer with cheese and bacon",
-                "price": 10.5,
-                "tax": 10.5 * 0.18,
-                "active": True,
-                "category_id": "0d5a87e1-9891-42a4-ba90-2e72e3a9e496",
-            }
-        }
+    category_id: uuid.UUID
 
 
 class Product(ProductBase, table=True):
@@ -38,7 +26,6 @@ class Product(ProductBase, table=True):
 
 
 class ProductCreate(ProductBase):
-    category_id: uuid.UUID | None = None
     tax: Decimal | None = None
     active: bool | None = None
 
