@@ -1,3 +1,4 @@
+import decimal
 import os
 import uuid
 from app.config import settings
@@ -5,49 +6,37 @@ from sqlmodel import Session, select
 from fastapi import UploadFile, status, HTTPException
 from app.models.products import Product, ProductCreate, ProductUpdate, ProductInDB
 from app.models.users import UserInDB
+from app.utils import save_image
 
-UPLOAD_DIR = "img/products/"
+UPLOAD_DIR = "img/product/"
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 
-async def create_product(product: ProductCreate, file: UploadFile, db: Session) -> ProductInDB:
-    
-    if file:
-        if file.content_type not in ["image/jpeg", "image/png"]:
+async def create_product(product: ProductCreate, image: UploadFile | None, db: Session) -> ProductInDB:
+    tax = format(product.price * decimal.Decimal(0.18), ".2f")
+    if image:
+        if image.content_type not in ["image/jpeg", "image/png"]:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Only images allowed ''jpeg' or 'png'")
-    
-        file_name = f'{uuid.uuid4().hex}{os.path.splitext(file.filename)[1]}'
-        file_name_dir = os.path.join(UPLOAD_DIR, file_name)
-        
-        with open(file_name_dir, "wb") as buffer:
-            buffer.write(await file.read())
-        
+
+        image_name = await save_image(image, UPLOAD_DIR)
+        print(image_name, "nombre imagen")
         extra_data = {
-            "tax": round(product.price * 0.18, 2),
-            "image": ("",file_name)[file] 
+            "tax": tax,
+            "image": f"{image_name}",
         }
     else: 
         extra_data = {
-            "tax": round(product.price * 0.18, 2),
-            "image": ""
-        }
+            "tax": tax,
+            "image": "",
+        }    
     product = Product.model_validate(product, update=extra_data)
     db.add(product)
     db.commit()
     db.refresh(product)
-    product = {
-      "id": product.id,
-        "name": product.name,
-        "description": product.description,
-        "price": product.price,
-        "tax": product.tax,
-        "active": product.active,
-        "image": (product.image, f"{settings.SERVER_HOST}/{UPLOAD_DIR}{product.image}")[product.image != ""]
-        
-    }
+    product. image= (product.image, f"{settings.SERVER_HOST}/{UPLOAD_DIR}{product.image}")[product.image != ""]
     return product
 
 
@@ -56,6 +45,8 @@ def get_products(acessUser: UserInDB, db: Session) -> list[ProductInDB]:
     if len(products)  == 0:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Products not found")
+    for product in products:
+        product.image = (product.image, f"{settings.SERVER_HOST}/{UPLOAD_DIR}{product.image}")[product.image != ""]
     return products
 
 
@@ -64,6 +55,7 @@ def get_product_by_id(id: uuid.UUID, db: Session) -> ProductInDB:
     if not product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"Product not found")
+    product.image = (product.image, f"{settings.SERVER_HOST}/{UPLOAD_DIR}{product.image}")[product.image != ""]
     return product
 
 
