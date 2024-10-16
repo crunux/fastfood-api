@@ -2,14 +2,15 @@ from datetime import datetime
 import uuid
 from sqlmodel import Session, select
 from fastapi import status, HTTPException
-from app.models.details_orders import DetailsOrder, DetailsOrderCreate
+from app.models.details_orders import DetailsOrderCreate
+from app.models.products import Product
 from app.models.users import UserInDB
 from app.controllers.products import get_product_by_id
 from app.models.orders import Order, OrderCreate, OrderInDB, OrderUpdate
 from sqlalchemy.orm import selectinload
 
 
-def add_details_order(details_order: DetailsOrderCreate, db: Session) -> dict[str, int | float | str]:
+def calculateAmount(details_order: DetailsOrderCreate, db: Session) -> dict[str, any]:
     total_amount = 0
     total_tax = 0
     for detail in details_order:
@@ -17,21 +18,28 @@ def add_details_order(details_order: DetailsOrderCreate, db: Session) -> dict[st
         total_amount += detail.quantity * product.price
         total_tax += detail.quantity * product.tax
     total_amount += total_tax
-    return {"total_amount": total_amount, "total_tax": total_tax}
+    return {"total_amount": total_amount, "total_tax": total_tax }
 
 
 def create_order(order: OrderCreate, userAccess: UserInDB, db: Session) -> OrderInDB:
-    detailsData = add_details_order(order.details_orders, db)
+    print(order)
+    amount = calculateAmount(order.details_orders, db)
+    total_tax = (amount["total_tax"], order.total_tax)[order.total_tax != None or order.total_tax == 0 ]
+    total_amount = (amount["total_amount"], order.total_amount)[order.total_amount == amount["total_amount"] and order.total_amount != None]
+    user_id = (userAccess.id, order.user_id)[order.user_id != None]
     extra_data = {
-        "user_id": userAccess.id,
-        "total_amount": detailsData["total_amount"],
-        "total_tax": detailsData["total_tax"],
-        "order_date": datetime.now(),
+        "user_id": user_id,
+        "total_amount": total_amount,
+        "total_tax": total_tax,
+        "order_date": datetime.now()
     }
+    print(order, 'order before model validate')
     order = Order.model_validate(order, update=extra_data)
+    print(order)
     db.add(order)
     db.commit()
     db.refresh(order)
+    print(order)
     return order
 
 
@@ -61,7 +69,7 @@ def update_order(order_id: uuid.UUID, order: OrderUpdate, db: Session) -> Order:
     orderData = order.model_dump(exclude_unset=True)
     extra_data = {}
     if "details_orders" in orderData:
-        detailsData = add_details_order(orderData["details_orders"], db)
+        detailsData = calculateAmount(orderData["details_orders"], db)
         extra_data["total_amount"] = detailsData["total_amount"]
         extra_data["total_tax"] = detailsData["total_tax"]
     db_order.sqlmodel_update(orderData, update=extra_data)
