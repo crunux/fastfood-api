@@ -3,7 +3,7 @@ import os
 import uuid
 from app.config import settings
 from sqlmodel import Session, select
-from fastapi import UploadFile, status, HTTPException
+from fastapi import Request, UploadFile, status, HTTPException
 from app.models.products import Product, ProductCreate, ProductUpdate, ProductInDB
 from app.models.users import UserInDB
 from app.utils import save_image
@@ -12,7 +12,8 @@ UPLOAD_DIR = "img/product/"
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-
+print("UPLOAD_DIR", UPLOAD_DIR)
+print("settings.SERVER_HOST", settings.SERVER_HOST)
 
 async def create_product(product: ProductCreate, image: UploadFile | None, db: Session) -> ProductInDB:
     tax = format(product.price * decimal.Decimal(0.18), ".2f")
@@ -22,7 +23,6 @@ async def create_product(product: ProductCreate, image: UploadFile | None, db: S
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Only images allowed ''jpeg' or 'png'")
 
         image_name = await save_image(image, UPLOAD_DIR)
-        print(image_name, "nombre imagen")
         extra_data = {
             "tax": tax,
             "image": f"{image_name}",
@@ -36,9 +36,10 @@ async def create_product(product: ProductCreate, image: UploadFile | None, db: S
     db.add(product)
     db.commit()
     db.refresh(product)
-    product. image= (product.image, f"{settings.SERVER_HOST}/{UPLOAD_DIR}{product.image}")[product.image != ""]
+    product.image= (product.image, f"{settings.SERVER_HOST}/{UPLOAD_DIR}{product.image}")[product.image != ""]
     return product
 
+#request: Request, usando la url de request en request.base_url
 
 def get_products(acessUser: UserInDB, db: Session) -> list[ProductInDB]:
     products = db.exec(select(Product)).all()
@@ -55,7 +56,6 @@ def get_product_by_id(id: uuid.UUID, db: Session) -> ProductInDB:
     if not product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"Product not found")
-    product.image = (product.image, f"{settings.SERVER_HOST}/{UPLOAD_DIR}{product.image}")[product.image != ""]
     return product
 
 

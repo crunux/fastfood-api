@@ -20,7 +20,7 @@ class Product(ProductBase, table=True):
     id: uuid.UUID | None = Field(default_factory=uuid.uuid4, primary_key=True)
     category_id: uuid.UUID | None = Field(foreign_key="category.id")
     category: Category = Relationship(back_populates="products")
-    details_orders: list['DetailsOrder'] = Relationship(
+    details_orders: list['DetailsOrder'] = Relationship( # type: ignore
         back_populates="product")
     image: str = Field(default="")
 
