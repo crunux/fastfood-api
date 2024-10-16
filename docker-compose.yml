@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://root:Crunux19950502@db:5432/store
+      SERVER_HOST: 'api.crunux.tech'
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: Crunux19950502
+      POSTGRES_DB: store
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      
+volumes:
+  postgres_data:

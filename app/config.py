@@ -17,14 +17,19 @@ class Settings(BaseSettings):
     API_USERNAME: str = "admin"
     API_PASSWORD: str = "admin"
     API_EMAIL: str = "joancruz0502@hotmail.com"
-    ORIGINS: list[str] = [
-        "http://localhost",
-        "http://localhost:8080",
-        "http://localhost:3000",
-        "http://localhost:5000",
-        "http://localhost:8100",
-        "*"
-    ]
+    ORIGINS: list[str] = ["*"]
+    # ORIGINS: list[str] = [
+    #     "http://localhost:8100",
+    #     "http://localhost:*",
+    #     "http://localhost:8080",
+    #     "http://localhost:3000",
+    #     "http://localhost:5000",
+    #     "http://127.0.0.1:8100",
+    #     "http://127.0.0.1",
+    #     "http://10.0.0.169:8100"
+    #     "http://0.0.0.0",
+    #     "*"
+    # ]
     SECRET_KEY: str = "e13803a67359c67e64acfe5c943bc0d41edde0f8e5f4f6fb2839f3fe8460ab27"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 120
     SERVER_HOST: str = "http://127.0.0.1:5000"

@@ -6,7 +6,6 @@ import uuid
 
 from fastapi import HTTPException, UploadFile
 
-
 def sanitize_filename(filename: str) -> str:
     return re.sub(r'[^a-zA-Z0-9_.-]', '_', filename)
 
@@ -20,5 +19,5 @@ async def save_image(file: UploadFile,  UPLOAD_DIR: str) -> str:
             buffer.write(await file.read())  # Leer el archivo en binario y escribirlo
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error saving file: {str(e)}")
-
+    print("file_name", file_name)
     return file_name

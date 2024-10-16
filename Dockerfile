@@ -6,6 +6,6 @@ WORKDIR /app
 
 COPY . ./
 
-RUN poetry install --without dev
+RUN poetry install
 
 CMD [ "poetry", "run", "python", "server.py" ]
