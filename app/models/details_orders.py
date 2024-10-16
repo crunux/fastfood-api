@@ -1,8 +1,12 @@
 
+from typing import TYPE_CHECKING
 import uuid
 from pydantic import BaseModel
 from sqlmodel import SQLModel, Field, Relationship
 from app.models.products import Product, ProductInDB
+
+if TYPE_CHECKING:
+    from app.models.orders import Order
 
 
 class DetailsOrderBase(SQLModel):
@@ -27,10 +31,8 @@ class DetailsOrder(DetailsOrderBase, table=True):
 class DetailsOrderCreate(DetailsOrderBase):
     order_id: uuid.UUID | None = None
 
-
 class DetailsOrderUpdate(DetailsOrderBase):
     quantity: int | None = None
-
 
 class DetailsOrderInDB(BaseModel):
     id: uuid.UUID

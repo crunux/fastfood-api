@@ -36,7 +36,7 @@ class TokenResponse(BaseModel):
 
 class OAuth2CustomPasswordRequestForm(BaseModel):
     email: str = Form()
-    password: str
+    password: str = Form()
 
 
 class Msg(BaseModel):
