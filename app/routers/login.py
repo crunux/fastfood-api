@@ -1,6 +1,6 @@
 from datetime import timedelta
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, Form, HTTPException, status
 from sqlmodel import Session
 import uuid
 from app.config import settings
@@ -15,7 +15,8 @@ router = APIRouter(responses={
 
 
 @router.post("/token", response_model=TokenResponse)
-async def login_user(login_user: Annotated[OAuth2CustomPasswordRequestForm, Depends(LoginUser)], db: Session = Depends(get_session)) -> TokenResponse:
+async def login_user(email: Annotated[str, Form()], password: Annotated[str, Form()], db: Session = Depends(get_session)) -> TokenResponse:
+    login_user = LoginUser(email=email, password=password)
     return login(login_user, db)
 
 
