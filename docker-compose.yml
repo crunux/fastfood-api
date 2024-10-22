@@ -1,26 +1,45 @@
-version: '3.8'
-
 services:
-  web:
+  store-api:
     build: .
     restart: always
     ports:
       - "5000:5000"
     environment:
-      DATABASE_URL: postgresql://root:Crunux19950502@db:5432/store
-      SERVER_HOST: 'api.crunux.tech'
+      DATABASE_URL: "postgresql://root:Crunux19950502@db:5432/store"
+      SERVER_HOST: "https://api.crunux.tech/store"
     volumes:
-      - .:/code
+      - .:/app
     depends_on:
-      - db
-  db:
+      - postgresStore
+      
+  postgresStore:
     image: postgres
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: Crunux19950502
       POSTGRES_DB: store
     volumes:
-      - postgres-data:/var/lib/postgresql/data
-      
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    
+  pdAdmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4
+    restart: always
+    ports:
+      - 5050:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=joancruz0502@hotmail.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    volumes:
+      - ./pgadmin:/var/lib/pgadmin
+      - ./pgadmin:/certs/server.cert
+      - ./pgadmin:/certs/server.key
+      - ./pgadmin:/pgadmin4/servers.json
+    depends_on:
+      - postgresStore
+    
+
 volumes:
   postgres_data:

@@ -22,7 +22,6 @@ def calculateAmount(details_order: DetailsOrderCreate, db: Session) -> dict[str,
 
 
 def create_order(order: OrderCreate, userAccess: UserInDB, db: Session) -> OrderInDB:
-    print(order)
     amount = calculateAmount(order.details_orders, db)
     total_tax = (amount["total_tax"], order.total_tax)[order.total_tax != None or order.total_tax == 0 ]
     total_amount = (amount["total_amount"], order.total_amount)[order.total_amount == amount["total_amount"] and order.total_amount != None]
@@ -33,13 +32,10 @@ def create_order(order: OrderCreate, userAccess: UserInDB, db: Session) -> Order
         "total_tax": total_tax,
         "order_date": datetime.now()
     }
-    print(order, 'order before model validate')
     order = Order.model_validate(order, update=extra_data)
-    print(order)
     db.add(order)
     db.commit()
     db.refresh(order)
-    print(order)
     return order
 
 

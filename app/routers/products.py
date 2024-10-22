@@ -29,8 +29,9 @@ async def read_products(userAccess: Annotated[UserInDB, Depends(get_current_acti
 
 
 @router.get("/{product_id}", response_model=ProductInDB, status_code=status.HTTP_200_OK)
-async def read_a_product(product_id: uuid.UUID, userAccess: Annotated[UserInDB, Depends(get_current_active_user)], db: Session = Depends(get_session)) -> ProductInDB:
+async def read_a_product( request: Request ,product_id: uuid.UUID, userAccess: Annotated[UserInDB, Depends(get_current_active_user)], db: Session = Depends(get_session)) -> ProductInDB:
     product =  get_product_by_id(product_id, db)
+    print(request.url, request.base_url)
     product.image = (product.image, f"{settings.SERVER_HOST}/{UPLOAD_DIR}{product.image}")[product.image != ""]
     return product
 
